@@ -52,8 +52,15 @@ void exibeDFT(Mat& fonte) {
     normalize(magnetudeDft, magnetudeDft, 0, 1, CV_MINMAX);  //Normalizar: significa multiplicar cada valor da matriz por um numero especifico.
     
     recentralizarDFT(magnetudeDft);
+    
+    namedWindow("DFT", CV_WINDOW_AUTOSIZE);
     imshow("DFT", magnetudeDft);
+    moveWindow("DFT", 0, 1080);
     waitKey();
+}
+
+void inverterDFT(Mat& fonte, Mat& destino) {
+    dft(fonte, destino, DFT_INVERSE | DFT_REAL_OUTPUT | DFT_SCALE);
 }
 
 int main(int argc, const char * argv[]) {
@@ -71,6 +78,12 @@ int main(int argc, const char * argv[]) {
     
     exibeDFT(dftDoOriginal);
     
+    Mat dftInvertido;
+    inverterDFT(dftDoOriginal, dftInvertido);
+    namedWindow("DFT Invertido", CV_WINDOW_AUTOSIZE);
+    imshow("DFT Invertido", dftInvertido);
+    moveWindow("DFT Invertido", (dftInvertido.cols/2), 1080);
+    waitKey();
     
     return 0;
 }
