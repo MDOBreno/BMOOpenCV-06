@@ -11,6 +11,28 @@
 using namespace cv;
 using namespace std;
 
+void capturarDFT(Mat& fonte, Mat& destino) {
+    Mat originalComplexo[2] = {fonte, Mat::zeros(fonte.size(), CV_32F)};
+    Mat prontoParaDft;
+    merge(originalComplexo, 2, prontoParaDft);
+    
+    dft(prontoParaDft, destino, DFT_COMPLEX_OUTPUT);
+}
+
+void exibeDFT(Mat& fonte) {
+    Mat arrayDividido[2] = {Mat::zeros(fonte.size(), CV_32F), Mat::zeros(fonte.size(), CV_32F)};
+    split(fonte, arrayDividido);
+    
+    // Magnetude: "Equivalente" a tirar o modulo(raiz da soma dos quadrados) do numero Real com o Imaginario
+    Mat magnetudeDft;
+    magnitude(arrayDividido[0], arrayDividido[1], magnetudeDft);
+    magnetudeDft += Scalar::all(1);
+    
+    log(magnetudeDft, magnetudeDft);        //Calcula o log e insere na mesma matriz
+    normalize(magnetudeDft, magnetudeDft, 0, 1, CV_MINMAX);  //Normalizar: significa multiplicar cada valor da matriz por um numero especifico.
+    imshow("DFT", magnetudeDft);
+    waitKey();
+}
 
 int main(int argc, const char * argv[]) {
     // insert code here...
@@ -22,14 +44,10 @@ int main(int argc, const char * argv[]) {
     Mat originalFloat;
     original.convertTo(originalFloat, CV_32FC1, 1.0/255.0);
     
-    Mat originalComplexo[2] = {originalFloat, Mat::zeros(originalFloat.size(), CV_32F)};
-    Mat prontoParaDft;
-    merge(originalComplexo, 2, prontoParaDft);
-    
     Mat dftDoOriginal;
-    dft(prontoParaDft, dftDoOriginal, DFT_COMPLEX_OUTPUT);
+    capturarDFT(originalFloat, dftDoOriginal);
     
-    
+    exibeDFT(dftDoOriginal);
     
     
     return 0;
