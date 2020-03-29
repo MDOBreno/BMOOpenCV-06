@@ -19,6 +19,26 @@ void capturarDFT(Mat& fonte, Mat& destino) {
     dft(prontoParaDft, destino, DFT_COMPLEX_OUTPUT);
 }
 
+void recentralizarDFT(Mat& fonte) {
+    int centroX = fonte.cols / 2;
+    int centroY = fonte.rows / 2;
+    
+    Mat q1(fonte, Rect(0,0, centroX, centroY));
+    Mat q2(fonte, Rect(centroX,0, centroX, centroY));
+    Mat q3(fonte, Rect(0,centroY, centroX, centroY));
+    Mat q4(fonte, Rect(centroX,centroY, centroX, centroY));
+    
+    Mat mapaDeTroca;
+    
+    q1.copyTo(mapaDeTroca);
+    q4.copyTo(q1);
+    mapaDeTroca.copyTo(q4);
+    
+    q2.copyTo(mapaDeTroca);
+    q3.copyTo(q2);
+    mapaDeTroca.copyTo(q3);
+}
+
 void exibeDFT(Mat& fonte) {
     Mat arrayDividido[2] = {Mat::zeros(fonte.size(), CV_32F), Mat::zeros(fonte.size(), CV_32F)};
     split(fonte, arrayDividido);
@@ -30,6 +50,8 @@ void exibeDFT(Mat& fonte) {
     
     log(magnetudeDft, magnetudeDft);        //Calcula o log e insere na mesma matriz
     normalize(magnetudeDft, magnetudeDft, 0, 1, CV_MINMAX);  //Normalizar: significa multiplicar cada valor da matriz por um numero especifico.
+    
+    recentralizarDFT(magnetudeDft);
     imshow("DFT", magnetudeDft);
     waitKey();
 }
