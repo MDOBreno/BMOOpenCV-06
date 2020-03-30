@@ -63,6 +63,21 @@ void inverterDFT(Mat& fonte, Mat& destino) {
     dft(fonte, destino, DFT_INVERSE | DFT_REAL_OUTPUT | DFT_SCALE);
 }
 
+void criarGaussiano(Size& tamanho, Mat& saida, int uX, int uY, float sigmaX, float sigmaY, float amplitude=1.0f) {
+    Mat temp = Mat(tamanho, CV_32F);
+    
+    for (int linha=0; linha<tamanho.height; linha++) {
+        for (int coluna=0; coluna<tamanho.width; coluna++) {
+            float x = (((float)coluna-uX)*((float)coluna-uX)) / (2.0f * sigmaX * sigmaX);
+            float y = (((float)linha-uY)*((float)linha-uY)) / (2.0f * sigmaY * sigmaY);
+            float valor = amplitude * exp(-(x+y));
+            temp.at<float>(linha, coluna) = valor;
+        }
+    }
+    normalize(temp, temp, 0.0f, 1.0f, NORM_MINMAX);
+    saida = temp;
+}
+
 int main(int argc, const char * argv[]) {
     // insert code here...
     String caminho = "/Users/brenomedeiros/Documents/ProgramasBMO/Cpp/BMOOpenCV-06/BMOOpenCV-06/";
@@ -83,6 +98,14 @@ int main(int argc, const char * argv[]) {
     namedWindow("DFT Invertido", CV_WINDOW_AUTOSIZE);
     imshow("DFT Invertido", dftInvertido);
     moveWindow("DFT Invertido", (dftInvertido.cols/2), 1080);
+    waitKey();
+    
+    Mat saidaGaussiana;
+    Size tamanho = Size(256,256);
+    criarGaussiano(tamanho, saidaGaussiana, 256/2, 256/2, 10, 10);
+    namedWindow("Imagem Gaussiana", CV_WINDOW_AUTOSIZE);
+    imshow("Imagem Gaussiana", saidaGaussiana);
+    moveWindow("Imagem Gaussiana", 2*(saidaGaussiana.cols/2), 1080);
     waitKey();
     
     return 0;
